@@ -248,7 +248,7 @@ function () {
       onSelect: function onSelect(item, insertItem) {
         insertItem(item);
       },
-      mentionDenotationChars: ["@"],
+      mentionDenotationChars: ['@'],
       showDenotationChar: true,
       allowedChars: /^[a-zA-Z0-9_]*$/,
       minChars: 0,
@@ -257,9 +257,9 @@ function () {
       offsetLeft: 0,
       isolateCharacter: false,
       fixMentionsToQuill: false,
-      defaultMenuOrientation: "bottom",
-      dataAttributes: ["id", "value", "denotationChar", "link", "target"],
-      linkTarget: "_blank",
+      defaultMenuOrientation: 'bottom',
+      dataAttributes: ['id', 'value', 'denotationChar', 'link', 'target'],
+      linkTarget: '_blank',
       onOpen: function onOpen() {
         return true;
       },
@@ -267,9 +267,9 @@ function () {
         return true;
       },
       // Style options
-      listItemClass: "ql-mention-list-item",
-      mentionContainerClass: "ql-mention-list-container",
-      mentionListClass: "ql-mention-list",
+      listItemClass: 'ql-mention-list-item',
+      mentionContainerClass: 'ql-mention-list-container',
+      mentionListClass: 'ql-mention-list',
       spaceAfterInsert: true
     };
 
@@ -277,21 +277,21 @@ function () {
       dataAttributes: Array.isArray(options.dataAttributes) ? this.options.dataAttributes.concat(options.dataAttributes) : this.options.dataAttributes
     });
 
-    this.mentionContainer = document.createElement("div");
-    this.mentionContainer.className = this.options.mentionContainerClass ? this.options.mentionContainerClass : "";
-    this.mentionContainer.style.cssText = "display: none; position: absolute;";
+    this.mentionContainer = document.createElement('div');
+    this.mentionContainer.className = this.options.mentionContainerClass ? this.options.mentionContainerClass : '';
+    this.mentionContainer.style.cssText = 'display: none; position: absolute;';
     this.mentionContainer.onmousemove = this.onContainerMouseMove.bind(this);
 
     if (this.options.fixMentionsToQuill) {
-      this.mentionContainer.style.width = "auto";
+      this.mentionContainer.style.width = 'auto';
     }
 
-    this.mentionList = document.createElement("ul");
-    this.mentionList.className = this.options.mentionListClass ? this.options.mentionListClass : "";
+    this.mentionList = document.createElement('ul');
+    this.mentionList.className = this.options.mentionListClass ? this.options.mentionListClass : '';
     this.mentionContainer.appendChild(this.mentionList);
     this.quill.container.appendChild(this.mentionContainer);
-    quill.on("text-change", this.onTextChange.bind(this));
-    quill.on("selection-change", this.onSelectionChange.bind(this));
+    quill.on('text-change', this.onTextChange.bind(this));
+    quill.on('selection-change', this.onSelectionChange.bind(this));
     quill.keyboard.addBinding({
       key: Keys.TAB
     }, this.selectHandler.bind(this));
@@ -354,15 +354,15 @@ function () {
   }, {
     key: "showMentionList",
     value: function showMentionList() {
-      this.mentionContainer.style.visibility = "hidden";
-      this.mentionContainer.style.display = "";
+      this.mentionContainer.style.visibility = 'hidden';
+      this.mentionContainer.style.display = '';
       this.setMentionContainerPosition();
       this.setIsOpen(true);
     }
   }, {
     key: "hideMentionList",
     value: function hideMentionList() {
-      this.mentionContainer.style.display = "none";
+      this.mentionContainer.style.display = 'none';
       this.setIsOpen(false);
     }
   }, {
@@ -371,10 +371,10 @@ function () {
       var scrollItemInView = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
 
       for (var i = 0; i < this.mentionList.childNodes.length; i += 1) {
-        this.mentionList.childNodes[i].classList.remove("selected");
+        this.mentionList.childNodes[i].classList.remove('selected');
       }
 
-      this.mentionList.childNodes[this.itemIndex].classList.add("selected");
+      this.mentionList.childNodes[this.itemIndex].classList.add('selected');
 
       if (scrollItemInView) {
         var itemHeight = this.mentionList.childNodes[this.itemIndex].offsetHeight;
@@ -395,7 +395,7 @@ function () {
     key: "getItemData",
     value: function getItemData() {
       var link = this.mentionList.childNodes[this.itemIndex].dataset.link;
-      var hasLinkValue = typeof link !== "undefined";
+      var hasLinkValue = typeof link !== 'undefined';
       var itemTarget = this.mentionList.childNodes[this.itemIndex].dataset.target;
 
       if (hasLinkValue) {
@@ -430,15 +430,15 @@ function () {
       }
 
       if (!this.options.showDenotationChar) {
-        render.denotationChar = "";
+        render.denotationChar = '';
       }
 
       var prevMentionCharPos = this.mentionCharPos;
       this.quill.deleteText(this.mentionCharPos, this.cursorPos - this.mentionCharPos, Quill.sources.USER);
-      this.quill.insertEmbed(prevMentionCharPos, "mention", render, Quill.sources.USER);
+      this.quill.insertEmbed(prevMentionCharPos, 'mention', render, Quill.sources.USER);
 
       if (this.options.spaceAfterInsert) {
-        this.quill.insertText(prevMentionCharPos + 1, " ", Quill.sources.USER); // setSelection here sets cursor position
+        this.quill.insertText(prevMentionCharPos + 1, ' ', Quill.sources.USER); // setSelection here sets cursor position
 
         this.quill.setSelection(prevMentionCharPos + 2, Quill.sources.USER);
       } else {
@@ -475,16 +475,17 @@ function () {
     value: function renderList(mentionChar, data, searchTerm) {
       if (data && data.length > 0) {
         this.values = data;
-        this.mentionList.innerHTML = "";
+        this.mentionList.innerHTML = '';
 
         for (var i = 0; i < data.length; i += 1) {
-          var li = document.createElement("li");
-          li.className = this.options.listItemClass ? this.options.listItemClass : "";
+          var li = document.createElement('li');
+          li.className = this.options.listItemClass ? this.options.listItemClass : '';
           li.dataset.index = i;
           li.innerHTML = this.options.renderItem(data[i], searchTerm);
           li.onmouseenter = this.onItemMouseEnter.bind(this);
           li.dataset.denotationChar = mentionChar;
           li.onclick = this.onItemClick.bind(this);
+          li.onmousedown = this.onItemClick.bind(this);
           this.mentionList.appendChild(attachDataValues(li, data[i], this.options.dataAttributes));
         }
 
@@ -562,7 +563,7 @@ function () {
       } // handle vertical positioning
 
 
-      if (this.options.defaultMenuOrientation === "top") {
+      if (this.options.defaultMenuOrientation === 'top') {
         // Attempt to align the mention container with the top of the quill editor
         if (this.options.fixMentionsToQuill) {
           topPos = -1 * (containerHeight + this.options.offsetTop);
@@ -612,7 +613,7 @@ function () {
 
       this.mentionContainer.style.top = "".concat(topPos, "px");
       this.mentionContainer.style.left = "".concat(leftPos, "px");
-      this.mentionContainer.style.visibility = "visible";
+      this.mentionContainer.style.visibility = 'visible';
     }
   }, {
     key: "getTextBeforeCursor",
@@ -650,7 +651,7 @@ function () {
   }, {
     key: "onTextChange",
     value: function onTextChange(delta, oldDelta, source) {
-      if (source === "user") {
+      if (source === 'user') {
         this.onSomethingChange();
       }
     }
@@ -668,6 +669,6 @@ function () {
   return Mention;
 }();
 
-Quill.register("modules/mention", Mention);
+Quill.register('modules/mention', Mention);
 
 module.exports = Mention;
