@@ -1,5 +1,19 @@
 import Quill from 'quill';
 
+function _typeof(obj) {
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -187,7 +201,104 @@ function (_Embed) {
     return _possibleConstructorReturn(this, _getPrototypeOf(MentionBlot).apply(this, arguments));
   }
 
-  _createClass(MentionBlot, null, [{
+  _createClass(MentionBlot, [{
+    key: "update",
+
+    /**
+     * Redefine the `update` method to handle the `childList` case.
+     * This is necessary to correctly handle "backspace" on Android using Gboard.
+     * It behaves differently than other cases and we need to handle the node
+     * removal instead of the `characterData`.
+     *
+     * TODO: create a ticket reporting this problem!
+     */
+    value: function update(mutations, context) {
+      var _this = this;
+
+      // `childList` mutations are not handled on Quill
+      // see `update` implementation on:
+      // https://github.com/quilljs/quill/blob/master/blots/embed.js
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        var _loop = function _loop() {
+          var mutation = _step.value;
+          if (mutation.type != 'childList') return "continue";
+          if (mutation.removedNodes.length == 0) return "continue";
+          var nodeType = mutation.removedNodes[0].nodeType;
+          setTimeout(function () {
+            return _this._remove(nodeType);
+          }, 0);
+          return {
+            v: void 0
+          };
+        };
+
+        for (var _iterator = mutations[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var _ret = _loop();
+
+          switch (_ret) {
+            case "continue":
+              continue;
+
+            default:
+              if (_typeof(_ret) === "object") return _ret.v;
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+            _iterator["return"]();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      var unhandledMutations = mutations.filter(function (m) {
+        return m.type != 'childList';
+      });
+
+      _get(_getPrototypeOf(MentionBlot.prototype), "update", this).call(this, unhandledMutations, context);
+    }
+    /**
+     * Custom self removal, this is a wrapper around the default `remove`
+     * to correct the cursor position right after removing the mention.
+     *
+     * @param {number} nodeType: the type of node that was removed.
+     * This is important since depending the type of node we are removing,
+     * the resulting position of the cursor will change.
+     * E.g.:
+     * - on desktop a mention removal triggers a mutation with an ELEMENT_NODE
+     * - on android a TEXT_NODE node removal is triggered
+     *
+     * NOTE: call this function as:
+     *   setTimeout(() => this._remove(nodeType), 0);
+     * otherwise you'll get the error: "The given range isn't in document."
+     */
+
+  }, {
+    key: "_remove",
+    value: function _remove(nodeType) {
+      var adjust = 0;
+      if (nodeType === Node.TEXT_NODE) adjust = -1;
+      var cursorPosition = quill.getSelection().index + adjust; // see `remove` implementation on:
+      // https://github.com/quilljs/parchment/blob/master/src/blot/abstract/shadow.ts
+
+      this.remove(); // schedule cursor positioning after quill is done with whatever has scheduled
+
+      setTimeout(function () {
+        return quill.setSelection(cursorPosition, Quill.sources.API);
+      }, 0);
+    }
+  }], [{
     key: "create",
     value: function create(data) {
       var node = _get(_getPrototypeOf(MentionBlot), "create", this).call(this);
